@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	let popupOpen = $state(false);
 	let typedText = $state("");
@@ -10,7 +10,8 @@
 	let socket: WebSocket;
 
 	onMount(() => {
-		socket = new WebSocket(PUBLIC_BACKEND_URL);
+		const socketUrl = env.PUBLIC_BACKEND_URL;
+		socket = new WebSocket(socketUrl);
 
 		socket.onmessage = (event) => {
 			try {
