@@ -37,6 +37,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "letters": monkey_state.letter_history[-5000:],
         "words": monkey_state.found_words[-500:]
     }
+    await websocket.send_json(history_check)
 
     try:
         while True:
