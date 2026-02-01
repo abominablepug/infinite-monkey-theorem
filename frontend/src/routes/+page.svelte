@@ -17,8 +17,13 @@
 			try {
 				if (event.data.startsWith('{')) {
 					const data = JSON.parse(event.data);
-					tokens.push(data);
-					if (tokens.length > 500) tokens.shift();
+
+					if (data.type === 'history') {
+						typedText = data.letters;
+						tokens = data.words;
+					} else if (data.type === 'word') {
+						tokens.push(data);
+					}
 				} else {
 					typedText += event.data;
 					if (typedText.length > 5000) typedText = typedText.slice(-5000);

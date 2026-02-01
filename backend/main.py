@@ -10,6 +10,8 @@ class MonkeyState:
     def __init__(self):
         self.is_running = False
         self.current_word = ""
+        self.letter_history = ""
+        self.found_words = []
 
 monkey_state = MonkeyState()
 
@@ -28,16 +30,30 @@ def check_word(word: str):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+
+
+    history_check = {
+        "type": "history",
+        "letters": monkey_state.letter_history[-5000:],
+        "words": monkey_state.found_words[-500:]
+    }
+
     try:
         while True:
             if monkey_state.is_running:
                 letter = generate_random_letter()
+
+                monkey_state.letter_history += letter
+                if len(monkey_state.letter_history) > 10000:
+                    monkey_state.letter_history = monkey_state.letter_history[-10000:]
+
                 await websocket.send_text(letter)
                 
                 if letter == " ":
                     if monkey_state.current_word.strip():
                         word_info = check_word(monkey_state.current_word)
                         if word_info:
+                            monkey_state.found_words.append(word_info)
                             await websocket.send_json(word_info)
                     monkey_state.current_word = ""
                 else:
