@@ -9,6 +9,7 @@ app = FastAPI()
 class MonkeyState:
     def __init__(self):
         self.is_running = False
+        self.current_word = ""
 
 monkey_state = MonkeyState()
 
@@ -18,11 +19,11 @@ def generate_random_letter():
 
 spell = SpellChecker()
 
-def process_monkey_tokens(token):
-    cleaned_token = token.strip().lower()
-    if len(cleaned_token) > 1 and spell.known([cleaned_token]):
-        return {"text": token, "type": "word"}
-    return {"text": token, "type": "unknown"}
+def check_word(word: str):
+    word = word.strip().lower()
+    if len(word) > 1 and spell.known([word]):
+        return {"type": "word", "text": word.strip()}
+    return None
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -32,18 +33,25 @@ async def websocket_endpoint(websocket: WebSocket):
             if monkey_state.is_running:
                 letter = generate_random_letter()
                 await websocket.send_text(letter)
+                
+                if letter == " ":
+                    if monkey_state.current_word.strip():
+                        word_info = check_word(monkey_state.current_word)
+                        if word_info:
+                            await websocket.send_json(word_info)
+                    monkey_state.current_word = ""
+                else:
+                    monkey_state.current_word += letter
+
                 await asyncio.sleep(0.01)
-            else:
-                await asyncio.sleep(0.1)
             try:
                 data = await asyncio.wait_for(websocket.receive_text(), timeout=0.001)
                 if data == "start":
                     monkey_state.is_running = True
                 elif data == "stop":
                     monkey_state.is_running = False
-                else:
-                    token_info = process_monkey_tokens(data)
-                    await websocket.send_json(token_info)
+                elif data == "reset":
+                    monkey_state.current_word = ""
             except asyncio.TimeoutError:
                 pass
     except WebSocketDisconnect:

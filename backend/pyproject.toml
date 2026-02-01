@@ -45,5 +45,5 @@ dependencies = [
     "uvloop==0.22.1",
     "watchfiles==1.1.1",
     "websockets==16.0",
-    "spellchecker (>=0.4,<0.5)",
+    "pyspellchecker (>=0.8.4,<0.9.0)",
 ]
