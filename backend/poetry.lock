@@ -120,6 +120,18 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
+name = "enchant"
+version = "0.0.1"
+description = "Easier integration with Enchant.com"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "enchant-0.0.1-py3-none-any.whl", hash = "sha256:ce4af8ff70495a12aac4b130f9ea3328ca5d9489c328ce948aef5e583905fa4d"},
+    {file = "enchant-0.0.1.tar.gz", hash = "sha256:d690fb6b709f6bfbf5ffa533226ced29050f99e4d3890eef957595753bc1e24d"},
+]
+
+[[package]]
 name = "fastapi"
 version = "0.128.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1606,4 +1618,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "bd300fb9a76d7f5e4f44323b677cda0b5247c129804dd80d645fce9821a0a82f"
+content-hash = "0a72001dd205476b3b91f4173b7a3db54d2158bb5ec9c8b8e47db21011e43bf9"
