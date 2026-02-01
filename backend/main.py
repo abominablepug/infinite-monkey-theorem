@@ -1,8 +1,8 @@
 import asyncio
 import random
 import string
-import enchant
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from spellchecker import SpellChecker
 
 app = FastAPI()
 
@@ -16,15 +16,13 @@ def generate_random_letter():
     letter = random.choice(string.ascii_letters + " ")
     return letter
 
-dictionary = enchant.Dict("en_US")
+spell = SpellChecker()
 
-def check_for_words(text):
-    words = text.split()
-    found_words = []
-
-    for word in words:
-        if dictionary.check(word):
-            found_words.append(word)
+def process_monkey_tokens(token):
+    cleaned_token = token.strip().lower()
+    if len(cleaned_token) > 1 and spell.known([cleaned_token]):
+        return {"text": token, "type": "word"}
+    return {"text": token, "type": "unknown"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -43,13 +41,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     monkey_state.is_running = True
                 elif data == "stop":
                     monkey_state.is_running = False
+                else:
+                    token_info = process_monkey_tokens(data)
+                    await websocket.send_json(token_info)
             except asyncio.TimeoutError:
                 pass
     except WebSocketDisconnect:
         monkey_state.is_running = False
         print("Client disconnected")
 
-@app.get("/check_words/{text}")
-async def check_words_endpoint(text: str):
-    found_words = check_for_words(text)
-    return {"found_words": found_words}

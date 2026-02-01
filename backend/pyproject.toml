@@ -45,5 +45,5 @@ dependencies = [
     "uvloop==0.22.1",
     "watchfiles==1.1.1",
     "websockets==16.0",
-    "enchant (>=0.0.1,<0.0.2)",
+    "spellchecker (>=0.4,<0.5)",
 ]
