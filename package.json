@@ -1,0 +1,15 @@
+{
+  "name": "infinite-monkey-theorem",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm install && cd frontend && npm install",
+    "dev": "npm run setup && concurrently \"cd backend && poetry run uvicorn main:app --reload\" \"cd frontend && npm run dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
