@@ -1,4 +1,7 @@
 # Infinite Monkey Theorem
+
+<img width="911" height="625" alt="screenshot_2026-02-01_12-28-25" src="https://github.com/user-attachments/assets/ee4217b2-01f8-4142-855f-79b88d59608e" />
+
 ## What is it?
 The Infinite Monkey Theorem is a commonly cited theorem which posits that if a monkey were to hit a key at random on a typewriter for eternity, eventually it would write every and any given text including the full works of William Shakespeare in order. Its more generalized conclusion is that any infinite sequence of completely random and independent events will result in infinitely many occurrences. For example, it is physically possible that if an apple were to be placed in a vacuum and then decay it could eventually completely restore itself back to its original form. If you want to learn more about this theorem visit the wikipedia page [here](https://en.wikipedia.org/wiki/Infinite_monkey_theorem).
 ## What's this project?
