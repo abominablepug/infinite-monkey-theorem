@@ -19,7 +19,7 @@ The monkey is untested. It is very possible it types slurs or vulgar/explicit la
 
 #### Future features
 * [X] Sort by (time, length, reverse)
-* [ ] Word Search bar
+* [X] Word Search bar
 * [ ] Collapse duplicates
 * [ ] run in background
 * [ ] smart monkey (instead of random it has the probability of each letter + space)

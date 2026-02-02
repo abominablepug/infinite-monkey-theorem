@@ -8,8 +8,9 @@
 	let tokens = $state<{ type: string, text: string }[]>([]);
 	let sortMethod = $state('order');
 	let sortAscending = $state(true);
+	let filterText = $state('');
 
-	let sortedTokens = $derived.by(() => {
+	let modifiedTokens = $derived.by(() => {
 		let list = [...tokens];
 		if (sortMethod === 'order') {
 			list = list;
@@ -19,7 +20,12 @@
 			list.sort((a, b) => a.text.localeCompare(b.text));
 		}
 
-		return sortAscending ? list : list.reverse();
+		if (!sortAscending) list.reverse();
+
+		if (filterText.trim() !== '') {
+			list = list.filter(token => token.text.toLowerCase().includes(filterText.toLowerCase()));
+		}
+		return list;
 	})
 
 	let socket: WebSocket;
@@ -99,49 +105,66 @@
 		</div>
 
 		{#if popupOpen}
-			<div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-				<div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-fulll max-h-[70vh] flex flex-col shadow-2xl">
-					<div class="p-6 border-b border-slate-800 flex justify-between items-center">
-						<h2 class="text-xl font-bold text-cyan-400">Words Discovered</h2>
-						<select id="sort" name="sort" bind:value={sortMethod}
-							class="bg-transparent text-slate-300 text-sm pl-2 pr-8 py-1 focus:outline-none cursor-pointer hover:text-cyan-400 transition-colors"
-						>
-							<option value="order">Sort by Order</option>
-							<option value="length">Sort by Length</option>
-							<option value="alphabetical">Sort Alphabetically</option>
-						</select>
-						<button
-							onclick={() => sortAscending = !sortAscending}
-							class="px-3 py-1 text-xs font-bold transition-all duration-200 rounded-md
-							{sortAscending ? 'text-cyan-400 hover:bg-cyan-400/10' : 'text-purple-400 hover:bg-purple-400/10'}
-							hover:ring-1 hover:ring-current active:scale-95"
-							title="Toggle Sort Direction"
-						>
-							<span class="flex items-center gap-1">
-								{sortAscending ? 'ASC' : 'DESC'}
-								<span class="inline-block transform transition-transform duration-300 {sortAscending ? '' : 'rotate-180'}">
-									▲
-								</span>
-							</span>
-						</button>
-						<button onclick={() => popupOpen = false} class="text-slate-400 hover:text-white">x</button>
+			<div class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
+				<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col">
+					
+					<div class="p-6 border-b border-slate-800">
+						<div class="flex justify-between items-center mb-6">
+							<h2 class="text-xl font-bold text-cyan-400">Words Discovered</h2>
+							<button onclick={() => popupOpen = false} class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-red-900/40 hover:text-red-400 transition-all text-slate-400">✕</button>
+						</div>
+
+						<div class="flex flex-col md:flex-row gap-3">
+							<div class="relative flex-grow">
+								<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">FIND:</span>
+								<input 
+									type="text" 
+									placeholder="..." 
+									bind:value={filterText} 
+									class="w-full bg-black/40 border border-slate-700 rounded-lg pl-14 pr-4 py-2 text-cyan-500 placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all font-mono"
+								/>
+							</div>
+
+							<div class="flex items-center bg-black/40 border border-slate-700 rounded-lg px-2">
+								<select 
+									bind:value={sortMethod}
+									class="bg-transparent text-slate-400 text-xs py-2 focus:outline-none cursor-pointer hover:text-cyan-400"
+								>
+									<option value="order">Sequence</option>
+									<option value="length">Length</option>
+									<option value="alphabetical">A-Z</option>
+								</select>
+
+								<div class="w-[1px] h-4 bg-slate-700 mx-2"></div>
+
+								<button 
+									onclick={() => sortAscending = !sortAscending}
+									class="text-[10px] font-black px-2 py-1 rounded transition-colors {sortAscending ? 'text-cyan-400 bg-cyan-400/10' : 'text-purple-400 bg-purple-400/10'}"
+								>
+									{sortAscending ? 'ASC ▲' : 'DESC ▼'}
+								</button>
+							</div>
+						</div>
 					</div>
 
-					<div class="p-6 overflow-y-auto flex flex-wrap gap-2">
-						{#if tokens.length === 0}
-							<p class="text-slate-500 italic">No human language detected yet.</p>
+					<div class="p-6 overflow-y-auto flex flex-wrap gap-2 custom-scrollbar min-h-[200px] content-start">
+						{#if modifiedTokens.length === 0}
+							<div class="w-full py-12 text-center">
+								<p class="text-slate-600 italic">No patterns match current filter.</p>
+							</div>
 						{:else}
-							{#each sortedTokens as token}
-								<span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-full text-sm">
-									{token.text}
-								</span>
+							{#each modifiedTokens as token}
+								<div class="group relative px-3 py-1 bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 hover:bg-slate-800 rounded-md transition-all">
+									<span class="text-slate-300 group-hover:text-cyan-400 transition-colors">{token.text}</span>
+								</div>
 							{/each}
 						{/if}
 					</div>
 
-					<div class="p-4 bg-slate-950/50 text-right rounded-b-2xl">
-						<button onclick={() => popupOpen = false} class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-sm">
-							Close
+					<div class="p-4 bg-black/20 border-t border-slate-800 flex justify-between items-center rounded-b-2xl">
+						<span class="text-[10px] text-slate-500 uppercase">Visible: {modifiedTokens.length} / Total: {tokens.length}</span>
+						<button onclick={() => popupOpen = false} class="px-6 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-md transition-colors border border-slate-700">
+							Exit
 						</button>
 					</div>
 				</div>
