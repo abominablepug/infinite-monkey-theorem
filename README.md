@@ -16,3 +16,14 @@ To setup the project on your own server ort computer do the following:
 1. Open the website in your browser at the frontend port you set and enjoy!
 #### Disclaimer
 The monkey is untested. It is very possible it types slurs or vulgar/explicit language. Statistically it's possible for it to type out some of the most heinous things in the entire world so just be warned.
+
+#### Future features
+* [ ] Sort by (time, length, reverse)
+* [ ] Word Search bar
+* [ ] Collapse duplicates
+* [ ] run in background
+* [ ] smart monkey (instead of random it has the probability of each letter + space)
+* [ ] central server for all docker instances to report to
+* [ ] text checker (see how close you are to recreating a text... not in order ofc)
+* [ ] sentence maker (use words as building blocks to make your own monkey texts)
+
