@@ -9,6 +9,7 @@
 	let sortMethod = $state('order');
 	let sortAscending = $state(true);
 	let filterText = $state('');
+	let collapseDuplicates = $state(false);
 
 	let modifiedTokens = $derived.by(() => {
 		let list = [...tokens];
@@ -25,7 +26,26 @@
 		if (filterText.trim() !== '') {
 			list = list.filter(token => token.text.toLowerCase().includes(filterText.toLowerCase()));
 		}
-		return list;
+
+		if (collapseDuplicates) {
+			const counts = new Map<string, number>();
+			const uniqueList: { text: string, count: number }[] = [];
+
+			for (const word of list) {
+				const count = counts.get(word.text) || 0;
+				if (count === 0) {
+					uniqueList.push({ text: word.text, count: 1 });
+				}
+				counts.set(word.text, count + 1);
+			}
+
+			return uniqueList.map(word => ({
+				...word,
+				count: counts.get(word.text) || 1
+			}));
+		}
+
+		return list.map(word => ({ ...word, count: 1 }));
 	})
 
 	let socket: WebSocket;
@@ -143,6 +163,15 @@
 								>
 									{sortAscending ? 'ASC ▲' : 'DESC ▼'}
 								</button>
+
+								<div class="w-[1px] h-4 bg-slate-700 mx-2"></div>
+								<button 
+									onclick={() => collapseDuplicates = !collapseDuplicates}
+									class="text-[10px] font-black px-2 py-1 rounded transition-colors {collapseDuplicates ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-500 bg-slate-800'}"
+									title="Collapse Duplicates"
+								>
+									{collapseDuplicates ? 'UNIQUE' : 'DUPES'}
+								</button>
 							</div>
 						</div>
 					</div>
@@ -156,6 +185,12 @@
 							{#each modifiedTokens as token}
 								<div class="group relative px-3 py-1 bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 hover:bg-slate-800 rounded-md transition-all">
 									<span class="text-slate-300 group-hover:text-cyan-400 transition-colors">{token.text}</span>
+									
+									{#if token.count > 1}
+										<span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 rounded-full">
+											×{token.count}
+										</span>
+									{/if}
 								</div>
 							{/each}
 						{/if}
