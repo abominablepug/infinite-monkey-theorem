@@ -6,6 +6,21 @@
 	let typedText = $state("");
 	let status = $state("Disconnected");
 	let tokens = $state<{ type: string, text: string }[]>([]);
+	let sortMethod = $state('order');
+	let sortAscending = $state(true);
+
+	let sortedTokens = $derived.by(() => {
+		let list = [...tokens];
+		if (sortMethod === 'order') {
+			list = list;
+		} else if (sortMethod === 'length') {
+			list.sort((a, b) => b.text.length - a.text.length);
+		} else if (sortMethod === 'alphabetical') {
+			list.sort((a, b) => a.text.localeCompare(b.text));
+		}
+
+		return sortAscending ? list : list.reverse();
+	})
 
 	let socket: WebSocket;
 
@@ -46,7 +61,6 @@
 			socket.send(cmd);
 		}
 	};
-
 
 </script>
 
@@ -89,6 +103,27 @@
 				<div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-fulll max-h-[70vh] flex flex-col shadow-2xl">
 					<div class="p-6 border-b border-slate-800 flex justify-between items-center">
 						<h2 class="text-xl font-bold text-cyan-400">Words Discovered</h2>
+						<select id="sort" name="sort" bind:value={sortMethod}
+							class="bg-transparent text-slate-300 text-sm pl-2 pr-8 py-1 focus:outline-none cursor-pointer hover:text-cyan-400 transition-colors"
+						>
+							<option value="order">Sort by Order</option>
+							<option value="length">Sort by Length</option>
+							<option value="alphabetical">Sort Alphabetically</option>
+						</select>
+						<button
+							onclick={() => sortAscending = !sortAscending}
+							class="px-3 py-1 text-xs font-bold transition-all duration-200 rounded-md
+							{sortAscending ? 'text-cyan-400 hover:bg-cyan-400/10' : 'text-purple-400 hover:bg-purple-400/10'}
+							hover:ring-1 hover:ring-current active:scale-95"
+							title="Toggle Sort Direction"
+						>
+							<span class="flex items-center gap-1">
+								{sortAscending ? 'ASC' : 'DESC'}
+								<span class="inline-block transform transition-transform duration-300 {sortAscending ? '' : 'rotate-180'}">
+									▲
+								</span>
+							</span>
+						</button>
 						<button onclick={() => popupOpen = false} class="text-slate-400 hover:text-white">x</button>
 					</div>
 
@@ -96,7 +131,7 @@
 						{#if tokens.length === 0}
 							<p class="text-slate-500 italic">No human language detected yet.</p>
 						{:else}
-							{#each tokens as token}
+							{#each sortedTokens as token}
 								<span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-full text-sm">
 									{token.text}
 								</span>

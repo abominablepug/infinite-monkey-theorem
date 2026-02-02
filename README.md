@@ -18,7 +18,7 @@ To setup the project on your own server ort computer do the following:
 The monkey is untested. It is very possible it types slurs or vulgar/explicit language. Statistically it's possible for it to type out some of the most heinous things in the entire world so just be warned.
 
 #### Future features
-* [ ] Sort by (time, length, reverse)
+* [X] Sort by (time, length, reverse)
 * [ ] Word Search bar
 * [ ] Collapse duplicates
 * [ ] run in background
