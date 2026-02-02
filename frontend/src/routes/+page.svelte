@@ -56,17 +56,16 @@
 
 		socket.onmessage = (event) => {
 			try {
-				if (event.data.startsWith('{')) {
-					const data = JSON.parse(event.data);
+				const data = JSON.parse(event.data);
 
-					if (data.type === 'history') {
-						typedText = data.letters;
-						tokens = data.words;
-					} else if (data.type === 'word') {
-						tokens.push(data);
-					}
-				} else {
-					typedText += event.data;
+				if (data.type === 'history') {
+					typedText = data.letters;
+					tokens = data.words;
+				} else if (data.type === 'word') {
+					typedText += data.text.at(-1);
+					tokens.push(data);
+				} else if (data.type === 'letter') {
+					typedText += data.text;
 					if (typedText.length > 5000) typedText = typedText.slice(-5000);
 				}
 			} catch (e) {
