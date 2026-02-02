@@ -27,7 +27,7 @@ The monkey is untested. It is very possible it types slurs or vulgar/explicit la
 * [ ] add footer
 * [ ] track time spent typing
 * [ ] add when during the runtime each word was found
-* [ ] run in background
+* [X] run in background
 * [ ] smart monkey (instead of random it has the probability of each letter + space)
 * [ ] central server for all docker instances to report to
 * [ ] text checker (see how close you are to recreating a text... not in order ofc)
