@@ -1,9 +1,28 @@
 import asyncio
 import random
 import string
+import json
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from spellchecker import SpellChecker
 from contextlib import asynccontextmanager
+
+DATA_PATH = "/app/data/found_words.json"
+
+def save_found_words():
+    try:
+        with open(DATA_PATH, "w") as f:
+            json.dump(monkey_state.found_words, f)
+    except Exception as e:
+        print(f"Error saving found words: {e}")
+
+def load_found_words():
+    if os.path.exists(DATA_PATH):
+        try:
+            with open(DATA_PATH, "r") as f:
+                monkey_state.found_words = json.load(f)
+        except Exception as e:
+            print(f"Error loading found words: {e}")
 
 class MonkeyState:
     def __init__(self):
@@ -39,6 +58,7 @@ async def typing_monkey():
                     word_info = check_word(monkey_state.current_word)
                     if word_info:
                         monkey_state.found_words.append(word_info)
+                        save_found_words()
                         broadcast_message = word_info
                 monkey_state.current_word = ""
             else:
@@ -50,12 +70,13 @@ async def typing_monkey():
                 except:
                     pass
 
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.001)
         else:
             await asyncio.sleep(0.1)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    load_found_words()
     task = asyncio.create_task(typing_monkey())
     yield
 
@@ -70,7 +91,7 @@ async def websocket_endpoint(websocket: WebSocket):
     history_check = {
         "type": "history",
         "letters": monkey_state.letter_history[-5000:],
-        "words": monkey_state.found_words[-500:]
+        "words": monkey_state.found_words
     }
     await websocket.send_json(history_check)
 

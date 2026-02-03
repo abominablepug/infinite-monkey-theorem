@@ -6,6 +6,7 @@ services:
       - "8000:8000"
     volumes:
       - monkey_data:/root/.pyspellchecker
+      - monkey_data:/app/data
     logging:
       driver: "json-file"
       options:
