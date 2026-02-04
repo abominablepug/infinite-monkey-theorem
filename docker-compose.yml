@@ -6,7 +6,7 @@ services:
       - "8000:8000"
     volumes:
       - dictionary_cache:/root/.pyspellchecker
-      - monkey_data:/app/data
+      - ./data:/app/data
     logging:
       driver: "json-file"
       options:
@@ -24,4 +24,3 @@ services:
 
 volumes:
   dictionary_cache:
-  monkey_data:
