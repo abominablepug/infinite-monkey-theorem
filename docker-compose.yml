@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - monkey_data:/root/.pyspellchecker
+      - dictionary_cache:/root/.pyspellchecker
       - monkey_data:/app/data
     logging:
       driver: "json-file"
@@ -23,4 +23,5 @@ services:
       - backend
 
 volumes:
+  dictionary_cache:
   monkey_data:
