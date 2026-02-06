@@ -62,7 +62,7 @@
 					typedText = data.letters;
 					tokens = data.words;
 				} else if (data.type === 'word') {
-					typedText += data.text.at(-1);
+					typedText += " ";
 					tokens.push(data);
 				} else if (data.type === 'letter') {
 					typedText += data.text;
