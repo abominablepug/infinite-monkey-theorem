@@ -25,7 +25,7 @@ The monkey is untested. It is very possible it types slurs or vulgar/explicit la
 * [X] Word Search bar
 * [X] Collapse duplicates
 * [X] add footer
-* [ ] track time spent typing
+* [X] track time spent typing
 * [ ] add when during the runtime each word was found
 * [X] run in background
 * [ ] smart monkey (instead of random it has the probability of each letter + space)
