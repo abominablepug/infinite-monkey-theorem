@@ -3,6 +3,7 @@ import random
 import string
 import json
 import os
+import datetime
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from spellchecker import SpellChecker
 from contextlib import asynccontextmanager
@@ -44,7 +45,13 @@ spell = SpellChecker()
 def check_word(word: str):
     word = word.strip().lower()
     if len(word) > 1 and spell.known([word]):
-        return {"type": "word", "text": word.strip(), "active_time": monkey_state.active_time}
+        now = datetime.datetime.now().strftime("%H:%M:%S %Y-%m-%d")
+        return {
+            "type": "word",
+            "text": word,
+            "active_time": monkey_state.active_time,
+            "timestamp": now
+        }
     return None
 
 async def typing_monkey():
@@ -59,7 +66,10 @@ async def typing_monkey():
                 if monkey_state.current_word.strip():
                     word_info = check_word(monkey_state.current_word)
                     if word_info:
-                        monkey_state.found_words.append(word_info)
+                        monkey_state.found_words.append({
+                            "text": word_info["text"],
+                            "timestamp": word_info["timestamp"]
+                        })
                         save_found_words()
                         broadcast_message = word_info
                 monkey_state.current_word = ""

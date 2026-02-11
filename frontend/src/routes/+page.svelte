@@ -5,7 +5,8 @@
 	let popupOpen = $state(false);
 	let typedText = $state("");
 	let status = $state("Disconnected");
-	let tokens = $state<{ type: string, text: string }[]>([]);
+	let tokens = $state<{ text: string, timestamp: string }[]>([]);
+	let hoveredToken = $state<{ text: string, timestamp: string } | null>(null);
 	let sortMethod = $state('order');
 	let sortAscending = $state(true);
 	let filterText = $state('');
@@ -211,16 +212,31 @@
 							</div>
 						{:else}
 							{#each modifiedTokens as token}
-								<div class="group relative px-3 py-1 bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 hover:bg-slate-800 rounded-md transition-all">
-									<span class="text-slate-300 group-hover:text-cyan-400 transition-colors">{token.text}</span>
-									
+								<button 
+									onmouseenter={() => hoveredToken = token}
+									onmouseleave={() => hoveredToken = null}
+									class="group px-3 py-1.5 bg-slate-800/30 border border-slate-800 hover:border-cyan-500/50 rounded-md transition-all"
+								>
+									<span class="text-slate-300 group-hover:text-cyan-400">{token.text}</span>
 									{#if token.count > 1}
-										<span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 rounded-full">
-											×{token.count}
-										</span>
+										<span class="ml-1 text-[10px] font-black text-emerald-500">×{token.count}</span>
 									{/if}
-								</div>
+								</button>
 							{/each}
+						{/if}
+					</div>
+
+					<div class="px-6 py-2 bg-black/40 border-t border-slate-800/50 h-10 flex items-center">
+						{#if hoveredToken}
+							<div class="flex items-center gap-4 animate-in fade-in slide-in-from-left-2 duration-200">
+								<span class="text-[10px] text-slate-500 uppercase font-bold">Selected:</span>
+								<span class="text-xs text-cyan-400 font-bold">"{hoveredToken.text}"</span>
+								<span class="text-[10px] text-slate-600">—</span>
+								<span class="text-[10px] text-slate-500 uppercase font-bold">Found at:</span>
+								<span class="text-xs text-emerald-500 tabular-nums">{hoveredToken.timestamp}</span>
+							</div>
+						{:else}
+							<span class="text-[10px] text-slate-600 italic">Hover a word to see discovery details...</span>
 						{/if}
 					</div>
 
