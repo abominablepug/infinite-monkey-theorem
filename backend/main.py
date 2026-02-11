@@ -31,6 +31,7 @@ class MonkeyState:
         self.letter_history = ""
         self.found_words = []
         self.active_connections: list[WebSocket] = []
+        self.active_time = 0.0
 
 monkey_state = MonkeyState()
 
@@ -43,7 +44,7 @@ spell = SpellChecker()
 def check_word(word: str):
     word = word.strip().lower()
     if len(word) > 1 and spell.known([word]):
-        return {"type": "word", "text": word.strip()}
+        return {"type": "word", "text": word.strip(), "active_time": monkey_state.active_time}
     return None
 
 async def typing_monkey():
@@ -51,8 +52,9 @@ async def typing_monkey():
         if monkey_state.is_running:
             letter = generate_random_letter()
             monkey_state.letter_history += letter
+            monkey_state.active_time += 0.001
 
-            broadcast_message = {"type": "letter", "text": letter}
+            broadcast_message = {"type": "letter", "text": letter, "active_time": monkey_state.active_time}
             if letter == " ":
                 if monkey_state.current_word.strip():
                     word_info = check_word(monkey_state.current_word)
@@ -91,7 +93,8 @@ async def websocket_endpoint(websocket: WebSocket):
     history_check = {
         "type": "history",
         "letters": monkey_state.letter_history[-5000:],
-        "words": monkey_state.found_words
+        "words": monkey_state.found_words,
+        "active_time": monkey_state.active_time
     }
     await websocket.send_json(history_check)
 

@@ -10,6 +10,15 @@
 	let sortAscending = $state(true);
 	let filterText = $state('');
 	let collapseDuplicates = $state(false);
+	let activeTime = $state(0.0);
+
+	let formattedTime = $derived.by(() => {
+		const totalSeconds = Math.floor(activeTime);
+		const hours = Math.floor(totalSeconds / 3600);
+		const minutes = Math.floor((totalSeconds % 3600) / 60);
+		const seconds = totalSeconds % 60;
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	})
 
 	let modifiedTokens = $derived.by(() => {
 		let list = [...tokens];
@@ -68,6 +77,7 @@
 					typedText += data.text;
 					if (typedText.length > 5000) typedText = typedText.slice(-5000);
 				}
+				activeTime = data.active_time || activeTime;
 			} catch (e) {
 				console.error("Error parsing message:", e);
 			}
@@ -95,6 +105,10 @@
 			<h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-600 bg-clip-text text-transparent">
 				Infinite Monkey Theorem
 			</h1>
+			<div class="flex items-center gap-2 mt-1">
+				<span class="text-[10px] text-slate-500 uppercase tracking-tighter">Total Runtime:</span>
+				<span class="text-xs font-bold text-cyan-500 tabular-nums">{formattedTime}</span>
+			</div>
 			<div class="flex items-center gap-2">
 				<div class="w-3 h-3 rounded-full {status === "Connected" ? "bg-emerald-500 animate-pulse" : "bg-red-500"}"></div>
 				<span class="text-sm font-medium uppercase tracking-widest">{status}</span>
